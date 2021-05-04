@@ -4,21 +4,35 @@ const express = require("express");
 const cors = require("cors");
 
 admin.initializeApp();
+const db = admin.firestore();
 // const db = admin.firestore();
 const app = express();
 app.use(cors({origin: true}));
 
-app.post("/", async (req, res) => {
-  const user = req.body;
-  await admin.firestore().collection("users").add(user);
-  res.status(201).send();
+app.get("/", async (req, res) => {
+  const response = await db.collection("general").get();
+  res.status(200).send(response);
 });
 
 app.post("/", async (req, res) => {
-  const application = req.body;
-  await admin.firestore().collection("applications").add(application);
+  const user =
+    {
+      firstname: req.body["firstname"],
+      lastname: req.body["lastname"],
+      gender: req.body["gender"],
+      email: req.body["email"],
+      age: req.body["age"],
+      applicationType: req.body["applicationType"],
+      resume: req.body["resume"],
+    };
+  await db.collection("general")
+      .doc("applicants")
+      .collection("volunteers")
+      .add(user);
   res.status(201).send();
 });
+
 
 exports.user = functions.https.onRequest(app);
-exports.application = functions.https.onRequest(app);
+exports.response = functions.https.onRequest(app);
+
