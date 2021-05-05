@@ -3,7 +3,7 @@ const admin = require("firebase-admin");
 const express = require("express");
 const cors = require("cors");
 
-// index.js is a REST API with endpoints implemented 
+// index.js is a REST API with endpoints implemented
 // using firebase functions and deployed to cloud
 // hence "serverless" implementation
 
@@ -37,7 +37,7 @@ app.get("/", async (req, res) => {
   res.status(200).send(JSON.stringify(applicants));
 });
 
-app.get("/hackers", async (req, res) => {
+app.get("/general/applicants/hackers", async (req, res) => {
   // get all hackers
 
   const snapshot = await db.collection("general")
@@ -55,7 +55,7 @@ app.get("/hackers", async (req, res) => {
   res.status(200).send(JSON.stringify(hackers));
 });
 
-app.get("/volunteers", async (req, res) => {
+app.get("/general/applicants/volunteers", async (req, res) => {
   // get all volunteers
 
   const snapshot = await db.collection("general")
