@@ -73,24 +73,113 @@ app.get("/general/applicants/volunteers", async (req, res) => {
   res.status(200).send(JSON.stringify(volunteers));
 });
 
+app.get("/:id", async (req, res) => {
+  // get applicant by email(id)
+  const snapshot1 = await db.collection("general")
+      .doc("applicants")
+      .collection("volunteers").get();
+  const snapshot2 = await db.collection("general")
+      .doc("applicants")
+      .collection("hackers").get();
+
+  let user = {};
+
+  snapshot1.forEach((doc) => {
+    if (doc.id === req.params.id) {
+      const data = doc.data();
+      const id = doc.id;
+      user = {id, ...data};
+    }
+  });
+  snapshot2.forEach((doc) => {
+    if (doc.id === req.params.id) {
+      const data = doc.data();
+      const id = doc.id;
+      user = {id, ...data};
+    }
+  });
+  res.status(200).send(JSON.stringify(user));
+});
+
+app.put("/:id", async (req, res) => {
+  // update applicant
+  const body = req.body;
+  delete body.email;
+  delete body.applicationType;
+  const ref1 = db.collection("general")
+      .doc("applicants")
+      .collection("volunteers").doc(req.params.id);
+  const ref2 = db.collection("general")
+      .doc("applicants")
+      .collection("hackers").doc(req.params.id);
+
+  await ref1.get()
+      .then((snapshot) => {
+        if (snapshot.exists) {
+          ref1.update(req.body);
+          res.status(200).send(`${req.params.id}
+                                successfully updated with
+                                ${JSON.stringify(body)}`);
+        }
+      });
+  await ref2.get()
+      .then((snapshot) => {
+        if (snapshot.exists) {
+          ref2.update(req.body);
+          res.status(200).send(`${req.params.id}
+                                successfully updated with
+                                ${JSON.stringify(body)}`);
+        }
+      });
+});
+
+app.delete("/:id", async (req, res) => {
+  // remove applicant
+  const ref1 = db.collection("general")
+      .doc("applicants")
+      .collection("volunteers").doc(req.params.id);
+  const ref2 = db.collection("general")
+      .doc("applicants")
+      .collection("hackers").doc(req.params.id);
+
+  await ref1.get()
+      .then((snapshot) => {
+        if (snapshot.exists) {
+          ref1.delete();
+          res.status(200).send(`${req.params.id} 
+                              successfully removed from volunteers`);
+        }
+      });
+  await ref2.get()
+      .then((snapshot) => {
+        if (snapshot.exists) {
+          ref2.delete();
+          res.status(200).send(`${req.params.id} 
+                                successfully removed from hackers`);
+        }
+      });
+});
+
 app.post("/", async (req, res) => {
   const applicant = req.body;
   if (req.body["applicationType"] === "Volunteer") {
     await db.collection("general")
         .doc("applicants")
         .collection("volunteers")
-        .add(applicant);
+        .doc(req.body["email"])
+        .set(applicant);
     res.status(201).send();
   } else if (req.body["applicationType"] === "Hacker") {
     await db.collection("general")
         .doc("applicants")
         .collection("hackers")
-        .add(applicant);
+        .doc(req.body["email"])
+        .set(applicant);
     res.status(201).send();
   } else {
     res.status(500).send("invalid application type");
   }
 });
 
-exports.applicant = functions.https.onRequest(app);
+exports.api = functions.https.onRequest(app);
 
