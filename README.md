@@ -22,7 +22,6 @@ Included are several methods:
 #  DELETE- remove an applicant from db: https://us-central1-alperdec-backend.cloudfunctions.net/api/:id --where id is the email
    
    
- #  This project was my first time putting together a REST API and using a noSQL database such as firestore. Thank you and enjoy!:)
-   
-#   --Alper
+   This project was my first time putting together a REST API and using a noSQL database such as firestore. Thank you and enjoy!:)
+    --Alper
    
